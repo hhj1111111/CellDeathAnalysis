@@ -1,21 +1,23 @@
 Package: CellDeathAnalysis
 Title: Comprehensive Analysis of Cell Death Pathways in Gene Expression Data
-Version: 0.3.0
+Version: 0.4.0
 Authors@R: 
     person("Keran", "Sun", , "s1214844197@163.com", role = c("aut", "cre"))
-Description: A comprehensive R package for analyzing cell death pathway-related 
-    gene expression in transcriptomic data. The package provides curated gene 
-    sets for 14 types of regulated cell death (including ferroptosis, cuproptosis, 
-    disulfidptosis, pyroptosis, necroptosis, apoptosis, autophagy, and more), 
-    pathway scoring methods (ssGSEA, GSVA, AUCell), differential expression 
-    analysis, enrichment analysis (ORA and GSEA), survival analysis (Kaplan-Meier,
-    Cox regression, time-dependent ROC), single-cell analysis, machine learning 
-    prediction models, interactive Shiny application, and publication-ready 
-    visualizations. Ideal for cancer research, immunology, and cell biology studies.
+Description: A comprehensive R package for analyzing cell death pathway-related
+    gene expression in transcriptomic data. The package provides curated gene
+    sets for 14 types of regulated cell death (including ferroptosis, cuproptosis,
+    disulfidptosis, pyroptosis, necroptosis, apoptosis, autophagy, and more),
+    pathway scoring methods (ssGSEA, GSVA, AUCell, z-score, and the novel
+    crosstalk-aware scoring algorithm), cell death subtype classification via
+    consensus clustering, differential expression analysis, enrichment analysis
+    (ORA and GSEA), survival analysis (Kaplan-Meier, Cox regression,
+    time-dependent ROC), single-cell analysis, machine learning prediction
+    models, interactive Shiny application, and publication-ready visualizations.
+    Ideal for cancer research, immunology, and cell biology studies.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2
 Depends: 
     R (>= 4.0.0)
 Imports:

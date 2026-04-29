@@ -15,6 +15,8 @@
 #'     \item "median": Median expression of pathway genes
 #'     \item "aucell": AUCell method (requires AUCell package)
 #'     \item "zscore": Z-score normalized mean expression
+#'     \item "crosstalk": Crosstalk-aware scoring with specificity weighting
+#'       and residual debiasing (see \code{\link{calculate_death_score_crosstalk}})
 #'   }
 #' @param min_genes Integer. Minimum number of pathway genes required in
 #'   expression data. Pathways with fewer genes will be skipped. Default is 5.
@@ -44,7 +46,7 @@
 #'
 calculate_death_score <- function(expr,
                                    pathways = "all",
-                                   method = c("ssgsea", "gsva", "mean", "median", "aucell", "zscore"),
+                                   method = c("ssgsea", "gsva", "mean", "median", "aucell", "zscore", "crosstalk"),
                                    min_genes = 5,
                                    scale = FALSE,
                                    verbose = TRUE) {
@@ -119,7 +121,18 @@ calculate_death_score <- function(expr,
     "zscore" = .score_zscore(expr, gs_list),
     "ssgsea" = .score_ssgsea(expr, gs_list, verbose),
     "gsva" = .score_gsva(expr, gs_list, verbose),
-    "aucell" = .score_aucell(expr, gs_list, verbose)
+    "aucell" = .score_aucell(expr, gs_list, verbose),
+    "crosstalk" = {
+      if (verbose) cat("Using crosstalk-aware scoring...\n")
+      gene_weights <- .calc_gene_specificity(genesets)
+      sw_scores <- .specificity_weighted_score(expr, gs_list, gene_weights)
+      if (length(valid_pathways) >= 3) {
+        .residual_debias(sw_scores)
+      } else {
+        if (verbose) warning("Need >= 3 pathways for debiasing. Using specificity-weighted scores only.")
+        sw_scores
+      }
+    }
   )
   
   # 可选：标准化
@@ -131,6 +144,24 @@ calculate_death_score <- function(expr,
   attr(scores, "method") <- method
   attr(scores, "pathways") <- valid_pathways
   attr(scores, "gene_overlap") <- overlap_info[valid_pathways]
+
+  # 为 crosstalk 方法添加特有属性
+  if (method == "crosstalk") {
+    attr(scores, "gene_weights") <- gene_weights
+    attr(scores, "specificity_summary") <- do.call(rbind, lapply(valid_pathways, function(p) {
+      genes <- gs_list[[p]]
+      w <- gene_weights[genes]
+      w[is.na(w)] <- 1
+      data.frame(
+        pathway = p,
+        n_genes = length(genes),
+        mean_specificity = mean(w),
+        n_pathway_specific = sum(w > 3),
+        n_highly_shared = sum(w <= 2),
+        stringsAsFactors = FALSE
+      )
+    }))
+  }
   
   class(scores) <- c("death_scores", "data.frame")
   
