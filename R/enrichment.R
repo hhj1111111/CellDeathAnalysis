@@ -26,7 +26,7 @@
 #' print(result)
 #' }
 #'
-death_enrich_ora <- function(gene_list,
+death_enrich_ora <- function(gene_list,species = 'human',
                               pathways = "all",
                               background = NULL,
                               min_genes = 3,
@@ -34,6 +34,21 @@ death_enrich_ora <- function(gene_list,
   
   # Get gene sets
   genesets <- get_death_geneset(pathways, type = "all")
+
+  
+  library(SeuratExtend)
+  # 根据物种处理
+  if(species == "mouse"){
+    genesets_use <- lapply(genesets, function(gs){
+      unique(na.omit(
+        SeuratExtend::HumanToMouseGenesymbol(gs)$MGI.symbol
+      ))
+    })
+  } else {
+    genesets_use <- genesets
+  }
+
+
   
   if (!is.list(genesets)) {
     genesets <- list(genesets)
