@@ -176,7 +176,7 @@
 #' cor(scores_ct$ferroptosis, scores_z$ferroptosis)
 #' }
 #'
-calculate_death_score_crosstalk <- function(expr,
+calculate_death_score_crosstalk <- function(expr,species = 'human',
                                              pathways = "all",
                                              min_genes = 5,
                                              debias = TRUE,
@@ -200,8 +200,24 @@ calculate_death_score_crosstalk <- function(expr,
   # -------------------------------------------------------------------------
   # Get gene sets
   # -------------------------------------------------------------------------
+  if(sp='human')
   genesets <- get_death_geneset(pathways, type = "all")
 
+  library(SeuratExtend)
+  # 根据物种处理
+  if(species == "mouse"){
+    genesets_use <- lapply(genesets, function(gs){
+      unique(na.omit(
+        SeuratExtend::HumanToMouseGenesymbol(gs)$MGI.symbol
+      ))
+    })
+  } else {
+    genesets_use <- genesets
+  }
+
+
+
+  
   if (!is.list(genesets)) {
     genesets <- list(genesets)
     names(genesets) <- pathways
