@@ -200,7 +200,7 @@ calculate_death_score_crosstalk <- function(expr,species = 'human',
   # -------------------------------------------------------------------------
   # Get gene sets
   # -------------------------------------------------------------------------
-  if(sp='human')
+ 
   genesets <- get_death_geneset(pathways, type = "all")
 
   library(SeuratExtend)
