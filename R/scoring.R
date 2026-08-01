@@ -44,7 +44,7 @@
 #'                                  method = "zscore")
 #' }
 #'
-calculate_death_score <- function(expr,
+calculate_death_score <- function(expr,species = 'human',
                                    pathways = "all",
                                    method = c("ssgsea", "gsva", "mean", "median", "aucell", "zscore", "crosstalk"),
                                    min_genes = 5,
@@ -68,6 +68,22 @@ calculate_death_score <- function(expr,
   
   # 获取基因集
   genesets <- get_death_geneset(pathways, type = "all")
+
+  
+  library(SeuratExtend)
+  # 根据物种处理
+  if(species == "mouse"){
+    genesets_use <- lapply(genesets, function(gs){
+      unique(na.omit(
+        SeuratExtend::HumanToMouseGenesymbol(gs)$MGI.symbol
+      ))
+    })
+  } else {
+    genesets_use <- genesets
+  }
+
+
+
   
   if (!is.list(genesets)) {
     genesets <- list(genesets)
