@@ -353,7 +353,7 @@ plot_pathway_correlation <- function(scores,
 #'
 #' @export
 #'
-plot_pathway_genes <- function(expr,
+plot_pathway_genes <- function(expr,species = 'human',
                                 pathway,
                                 group = NULL,
                                 top_n = 20,
@@ -362,7 +362,19 @@ plot_pathway_genes <- function(expr,
   
   # 获取通路基因
   genes <- get_death_geneset(pathway, type = "all")
-  
+    library(SeuratExtend)
+  # 根据物种处理
+  if(species == "mouse"){
+    genesets_use <- lapply(genesets, function(gs){
+      unique(na.omit(
+        SeuratExtend::HumanToMouseGenesymbol(gs)$MGI.symbol
+      ))
+    })
+  } else {
+    genesets_use <- genesets
+  }
+
+
   # 找到表达数据中存在的基因
   common_genes <- intersect(genes, rownames(expr))
   
