@@ -187,7 +187,7 @@ print.death_ora <- function(x, ...) {
 #' result <- death_enrich_gsea(ranked)
 #' }
 #'
-death_enrich_gsea <- function(ranked_genes,
+death_enrich_gsea <- function(ranked_genes,species = 'human',
                                pathways = "all",
                                nperm = 1000,
                                min_size = 10,
@@ -199,6 +199,21 @@ death_enrich_gsea <- function(ranked_genes,
   
   # Get gene sets
   genesets <- get_death_geneset(pathways, type = "all")
+
+  library(SeuratExtend)
+  # 根据物种处理
+  if(species == "mouse"){
+    genesets_use <- lapply(genesets, function(gs){
+      unique(na.omit(
+        SeuratExtend::HumanToMouseGenesymbol(gs)$MGI.symbol
+      ))
+    })
+  } else {
+    genesets_use <- genesets
+  }
+
+
+
   
   if (!is.list(genesets)) {
     genesets <- list(genesets)
@@ -413,7 +428,7 @@ plot_enrichment_dot <- function(enrich_result,
 #' @import ggplot2
 #' @export
 #'
-plot_gsea_curve <- function(ranked_genes,
+plot_gsea_curve <- function(ranked_genes,species = 'human',
                              pathway,
                              title = NULL) {
   
@@ -423,6 +438,21 @@ plot_gsea_curve <- function(ranked_genes,
   
   # Get pathway genes
   pathway_genes <- get_death_geneset(pathway, type = "all")
+
+  library(SeuratExtend)
+  # 根据物种处理
+  if(species == "mouse"){
+    pathway_genes <- lapply(pathway_genes, function(gs){
+      unique(na.omit(
+        SeuratExtend::HumanToMouseGenesymbol(gs)$MGI.symbol
+      ))
+    })
+  } else {
+    pathway_genes <- pathway_genes
+  }
+
+
+
   
   # Sort ranked genes
   ranked_genes <- sort(ranked_genes, decreasing = TRUE)
@@ -497,7 +527,7 @@ plot_gsea_curve <- function(ranked_genes,
 #'
 #' @export
 #'
-death_compare_groups <- function(expr,
+death_compare_groups <- function(expr,species = 'human',
                                   group,
                                   pathways = "all",
                                   method = c("t.test", "wilcox")) {
@@ -506,6 +536,23 @@ death_compare_groups <- function(expr,
   
   # Get gene sets
   genesets <- get_death_geneset(pathways, type = "all")
+
+    library(SeuratExtend)
+  # 根据物种处理
+  if(species == "mouse"){
+    genesets_use <- lapply(genesets, function(gs){
+      unique(na.omit(
+        SeuratExtend::HumanToMouseGenesymbol(gs)$MGI.symbol
+      ))
+    })
+  } else {
+    genesets_use <- genesets
+  }
+
+
+
+
+
   
   if (!is.list(genesets)) {
     genesets <- list(genesets)
