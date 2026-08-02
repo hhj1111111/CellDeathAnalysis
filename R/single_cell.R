@@ -34,7 +34,7 @@
 #' FeaturePlot(seurat_obj, features = "death_ferroptosis")
 #' }
 #'
-sc_death_score <- function(object,
+sc_death_score <- function(object,species = 'human',
                             pathways = "all",
                             method = c("aucell", "seurat", "mean", "zscore"),
                             assay = "RNA",
@@ -69,7 +69,22 @@ sc_death_score <- function(object,
  
   # Get gene sets
   genesets <- get_death_geneset(pathways, type = "all")
- 
+
+
+  library(SeuratExtend)
+  # 根据物种处理
+  if(species == "mouse"){
+    genesets_use <- lapply(genesets, function(gs){
+      unique(na.omit(
+        SeuratExtend::HumanToMouseGenesymbol(gs)$MGI.symbol
+      ))
+    })
+  } else {
+    genesets_use <- genesets
+  }
+
+
+  
   if (!is.list(genesets)) {
     genesets <- list(genesets)
     names(genesets) <- pathways
